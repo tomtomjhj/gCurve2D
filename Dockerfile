@@ -32,6 +32,7 @@ RUN wget https://github.com/tmux/tmux/releases/download/3.2/tmux-3.2.tar.gz && \
 
 # dependencies
 RUN apt-get install -y libgl1-mesa-dev libglew-dev freeglut3-dev
+RUN apt-get install -y libcgal-dev
 
 
 USER $USER_NAME

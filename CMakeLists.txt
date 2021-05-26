@@ -1,14 +1,16 @@
-project(gflip2d)
-cmake_minimum_required(VERSION 2.8)
+project(gCurve2d)
+cmake_minimum_required(VERSION 3.12)
 find_package(CUDA REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLUT REQUIRED)
+find_package(CGAL REQUIRED)
 set(CMAKE_BUILD_TYPE Release)
+# See https://arnon.dk/matching-sm-architectures-arch-and-gencode-for-various-nvidia-cards/
 set(CUDA_NVCC_FLAGS
     ${CUDA_NVCC_FLAGS};
-    -gencode arch=compute_50,code=sm_50
-    -gencode arch=compute_35,code=sm_35)
+    -gencode arch=compute_75,code=sm_75
+    -gencode arch=compute_61,code=sm_61)
 #add_definitions(-DREAL_TYPE_FP32)
 include_directories(
     src
