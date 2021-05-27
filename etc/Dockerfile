@@ -1,5 +1,5 @@
 # docker build -t gcurve-dev --network host --build-arg USER_NAME=$USER --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) .
-# docker run --rm -it --gpus all -v $HOME:$HOME --name asdf gcurve-dev bash
+# docker run --rm -it --detach-keys='ctrl-s,ctrl-q' --gpus all -v $HOME:$HOME --name asdf gcurve-dev tmux -2u
 
 # NOTE:          vvvvvv this should match host's CUDA version (check `nvidia-smi`)
 FROM nvidia/cuda:11.2.0-devel-ubuntu20.04
@@ -20,14 +20,7 @@ RUN apt-get install -y software-properties-common && \
     apt-get update
 RUN apt-get install -y build-essential make unzip autoconf automake libtool cmake g++ pkg-config
 RUN apt-get install -y python3 python3-pip python3-dev
-RUN apt-get install -y git wget curl gdb neovim htop
-
-# tmux
-RUN apt-get install -y libevent-dev ncurses-dev bison
-RUN wget https://github.com/tmux/tmux/releases/download/3.2/tmux-3.2.tar.gz && \
-    tar xzf tmux-3.2.tar.gz && \
-    cd tmux-3.2 && \
-    ./configure && make install -j4
+RUN apt-get install -y git wget curl gdb neovim tmux htop
 
 # dependencies
 RUN apt-get install -y libgl1-mesa-dev libglew-dev freeglut3-dev
