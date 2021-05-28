@@ -55,7 +55,30 @@ int main() {
   }
   VD vd2(points2.begin(), points2.end());
 
+  std::cout << "------------------------" << std::endl;
+
   // Requisites of Crust
+  // An edge of DT belongs to the crust of S if both its endpoints belong to S.
+  for (auto i = dt.all_edges_begin(); i != dt.all_edges_end(); i++) {
+    auto face = i->first;
+    auto index = i->second;
+    auto source = face->vertex(CGAL::Triangulation_cw_ccw_2::cw(index));
+    auto target = face->vertex(CGAL::Triangulation_cw_ccw_2::ccw(index));
+    std::cout << *source << " " << *target;
+
+    int source_in_S = std::find(points.begin(), points.end(),
+                                source->point()) != points.end();
+    int target_in_S = std::find(points.begin(), points.end(),
+                                target->point()) != points.end();
+
+    if (source_in_S && target_in_S) {
+      std::cout << " S contains both endpoints";
+    } else {
+      std::cout << " S does not contain at least one endpoint";
+    }
+
+    std::cout << std::endl;
+  }
 
   return 0;
 }
