@@ -20,7 +20,7 @@ RUN apt-get install -y software-properties-common && \
     apt-get update
 RUN apt-get install -y build-essential make unzip autoconf automake libtool cmake g++ pkg-config
 RUN apt-get install -y python3 python3-pip python3-dev
-RUN apt-get install -y git wget curl gdb neovim tmux htop
+RUN apt-get install -y git wget curl gdb neovim tmux htop bash-completion
 
 # dependencies
 RUN apt-get install -y libgl1-mesa-dev libglew-dev freeglut3-dev

@@ -36,6 +36,7 @@
 /*****************************************************************************/
 
 #include "../CommonTypes.h"
+#include "gDel2D/GPU/DPredWrapper.h"
 
 // float or double
 #ifdef REAL_TYPE_FP32
@@ -674,15 +675,6 @@ __device__ RealType incircleExact(const RealType *predConsts,
   RealType *adet = bdet;
   RealType *ddet = cdet;
 
-  RealType bvirt;
-  RealType avirt, bround, around;
-  RealType c;
-  RealType abig;
-  RealType ahi, alo, bhi, blo;
-  RealType err1, err2, err3;
-  RealType _i, _j;
-  RealType _0;
-
   two_mult_sub(predConsts, pa, pb, ab);
   two_mult_sub(predConsts, pb, pc, bc);
   two_mult_sub(predConsts, pc, pd, cd);
@@ -763,12 +755,6 @@ __device__ RealType incircleAdaptExact(const RealType *predConsts,
 
   RealType bvirt;
   RealType avirt, bround, around;
-  RealType c;
-  RealType abig;
-  RealType ahi, alo, bhi, blo;
-  RealType err1, err2, err3;
-  RealType _i, _j;
-  RealType _0;
 
   adx = (RealType)(pa[0] - pd[0]);
   bdx = (RealType)(pb[0] - pd[0]);

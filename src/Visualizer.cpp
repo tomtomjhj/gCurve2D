@@ -183,9 +183,9 @@ GLuint Visualizer::getColor(int id) {
 
   if (id >= 0) {
     if (!_colorMap.get(id, &color)) {
-      GLubyte newColor[4] = {int(randGen.getNext() * 255),
-                             int(randGen.getNext() * 255),
-                             int(randGen.getNext() * 255), 64};
+      GLubyte newColor[4] = {static_cast<GLubyte>(int(randGen.getNext() * 255)),
+                             static_cast<GLubyte>(int(randGen.getNext() * 255)),
+                             static_cast<GLubyte>(int(randGen.getNext() * 255)), 64};
 
       color = *((GLuint *)newColor);
 
@@ -212,11 +212,12 @@ void Visualizer::refresh() {
     glPoints[i].id = i | PointMask;
   }
 
-  if (_infIdx >= 0 && _infIdx < _pointNum)
+  if (_infIdx >= 0 && _infIdx < _pointNum) {
     if (_infIdx == 0)
       glPoints[_infIdx] = glPoints[1];
     else
       glPoints[_infIdx] = glPoints[0];
+  }
 
   glGenBuffers(1, &_pointBuf);
   glBindBuffer(GL_ARRAY_BUFFER, _pointBuf);
@@ -742,7 +743,7 @@ void Visualizer::display() {
   glLoadIdentity();
 
   glRasterPos2d(0.01, 0.01);
-  snprintf(buffer, MaxLen, "%i / %i", _curFrame + 1, _frameList.size());
+  snprintf(buffer, MaxLen, "%i / %zu", _curFrame + 1, _frameList.size());
   glutBitmapString(GLUT_BITMAP_9_BY_15, (unsigned char *)buffer);
 
   glutSwapBuffers();
