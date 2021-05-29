@@ -25,7 +25,7 @@ void thrust_free_all();
 void thrust_sort_by_key(
     DevVector<int>::iterator keyBeg, DevVector<int>::iterator keyEnd,
     thrust::zip_iterator<
-        thrust::tuple<DevVector<int>::iterator, DevVector<Point2>::iterator>>
+        thrust::tuple<DevVector<int>::iterator, DevVector<Point2>::iterator> >
         valueBeg);
 void thrust_transform_GetMortonNumber(DevVector<Point2>::iterator inBeg,
                                       DevVector<Point2>::iterator inEnd,

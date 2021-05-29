@@ -12,6 +12,8 @@ set(CUDA_NVCC_FLAGS
     ${CUDA_NVCC_FLAGS};
     -gencode arch=compute_75,code=sm_75
     -gencode arch=compute_61,code=sm_61)
+# silence clangd
+# add_compile_options(-ferror-limit=0 --no-cuda-version-check)
 #add_definitions(-DREAL_TYPE_FP32)
 include_directories(
     src

@@ -764,7 +764,7 @@ void GpuDel::splitTri() {
   IntDVec splitTriVec = _memPool.allocateAny<int>(_pointNum);
   _insNum = thrust_copyIf_TriHasVert(triToVert, splitTriVec);
 
-  const int extraTriNum = DIM * _insNum;
+  const int extraTriNum = GDEL2D_DIM * _insNum;
   const int splitTriNum = triNum + extraTriNum;
 
   if (_input->isProfiling(ProfDiag)) {
