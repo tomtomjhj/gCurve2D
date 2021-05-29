@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
     //        MoveWindow( hWnd, vis->getWidth() + 15, 0,
     //            rect.right - rect.left, rect.bottom - rect.top, true );
 
-    vis->init(argc, argv, "gDel2D-visualization");
+    vis->init(argc, argv, (char *)"gDel2D-visualization");
     vis->printHelp();
   }
 #else
