@@ -67,6 +67,11 @@ public:
     swapAndFree(tempVec);
   }
 
+  void shrink(size_t n) {
+    assert(n < _size);
+    _size = n;
+  }
+
   void resize(size_t n) {
     if (_capacity >= n) {
       _size = n;
@@ -108,7 +113,8 @@ public:
   __device__ __host__ size_t size() const { return _size; }
   size_t capacity() const { return _capacity; }
 
-  __device__ __host__ thrust::device_reference<T> operator[](const size_t index) const {
+  __device__ __host__ thrust::device_reference<T>
+  operator[](const size_t index) const {
     return _ptr[index];
   }
 
