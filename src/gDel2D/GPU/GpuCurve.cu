@@ -38,13 +38,14 @@ __device__ Point2 circumcenter(double coord[3][2]) {
   return Point2{{dcx + coord[0][0], dcy + coord[0][1]}};
 }
 
-__global__ void DT2VDVertices(const Point2DVec &points, const TriDVec &input,
-                              Point2DVec &output) {
-  GRID_STRIDE_LOOP(index, input.size()) {
-    const Tri tri = input[index];
+__global__ void DT2VDVertices(KerPoint2Array points,
+                              KerTriArray input,
+                              Point2 *output) {
+  GRID_STRIDE_LOOP(index, input._num) {
+    const Tri tri = input._arr[index];
     double coord[3][2];
     for (int i = 0; i < 3; i++) {
-      const Point2 point = points[tri._v[i]];
+      const Point2 point = points._arr[tri._v[i]];
       coord[i][0] = point._p[0];
       coord[i][1] = point._p[1];
     }
@@ -79,8 +80,10 @@ void GpuCurve::compute(const GCurve2DInput &input, GCurve2DOutput *output) {
 
   // convert to VD: compute circumcenter of triangles in GPU
   _v_points.resize(dt1Output.triVec.size());
-  DT2VDVertices<<<BlocksPerGrid, ThreadsPerBlock>>>(_s_points, dt1Output.triVec,
-                                                    _v_points);
+  DT2VDVertices<<<1, 1>>>(toKernelArray(_s_points),
+                          toKernelArray(dt1Output.triVec),
+                          toKernelPtr(_v_points));
+  CudaCheckError();
 
   // Let D be the Delaunay triangulation of S∪V.
   _sv_points.copyFrom2(_s_points, _v_points);

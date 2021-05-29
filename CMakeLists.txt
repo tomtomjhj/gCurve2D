@@ -5,10 +5,12 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(CGAL REQUIRED)
-set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug) # TODO
 set(CMAKE_VERBOSE_MAKEFILE "ON")
 # See https://arnon.dk/matching-sm-architectures-arch-and-gencode-for-various-nvidia-cards/
 set(CUDA_NVCC_FLAGS
+    -G # TODO
     ${CUDA_NVCC_FLAGS};
     -gencode arch=compute_75,code=sm_75
     -gencode arch=compute_61,code=sm_61)
