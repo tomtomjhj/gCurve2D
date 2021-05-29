@@ -30,8 +30,8 @@
 #include "GPU/CudaWrapper.h"
 #include "GPU/MemoryManager.h"
 
-#define DIM 2
-#define DEG (DIM + 1)
+#define GDEL2D_DIM 2
+#define DEG (GDEL2D_DIM + 1)
 
 #ifdef REAL_TYPE_FP32
 typedef float RealType;
