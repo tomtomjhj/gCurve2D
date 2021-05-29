@@ -55,3 +55,7 @@ cuda_add_executable(
       src/gDel2D/GPU/SmallCounters.cu
    )
 target_link_libraries(gCurve2D ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLUT_LIBRARIES} CGAL::CGAL)
+
+## cgal test
+ADD_EXECUTABLE(test_cgal src/examples/voronoi_example.cpp)
+target_link_libraries(test_cgal CGAL::CGAL)
