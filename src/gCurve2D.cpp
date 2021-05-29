@@ -16,6 +16,6 @@ int main(int argc, char *argv[]) {
   GpuCurve gpuCurve;
 
   InputCreator creator;
-  creator.makePoints(1000, UniformDistribution, input.pointVec, 76213898);
+  creator.makePoints(50, UniformDistribution, input.pointVec, 76213898);
   gpuCurve.compute(input, &output);
 }
