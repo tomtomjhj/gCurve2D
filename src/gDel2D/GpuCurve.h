@@ -13,10 +13,7 @@
 #include "GpuDelaunay.h"
 
 struct GCurve2DOutput {
-  // TODO
-
-  // Statistics
-  Statistics stats;
+  SegmentHVec segmentVec;
 };
 
 struct GCurve2DInput {
@@ -25,14 +22,18 @@ struct GCurve2DInput {
 
 class GpuCurve {
 private:
+  // input points
+  Point2DVec _s_points;
+
   // For computing V (VD of input)
-  GpuDel gDel;
-  const GDel2DInput *_input;
-  GDel2DOutput *_output;
+  GpuDel _v_gDel;
+  TriDVec _v_tris;
+  Point2DVec _v_points;
 
   // For computing DT of S∪V
+  GpuDel _sv_gDel;
+  Point2DVec _sv_points;
 
 public:
-  // TODO: input/output type?
   void compute(const GCurve2DInput &input, GCurve2DOutput *output);
 }; // class GpuCurve

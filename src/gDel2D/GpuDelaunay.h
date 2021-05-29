@@ -57,6 +57,16 @@ struct GDel2DInput {
   }
 };
 
+struct GDel2DOutputGPU {
+  GDel2DOutput dummy;
+  TriDVec triVec;
+};
+
+struct GDel2DInputGPU {
+  GDel2DInput dummy;
+  Point2DVec pointVec;
+};
+
 ////
 // Main class
 ////
@@ -155,11 +165,14 @@ private:
 
   // Main
   void initForFlip();
+  void initForFlipGPU(const GDel2DInputGPU &input);
   void splitAndFlip();
   void doInsertConstraints();
   void outputToHost();
+  void outputToGPU(GDel2DOutputGPU *output);
   void cleanup();
 
 public:
   void compute(const GDel2DInput &input, GDel2DOutput *output);
+  void computeGPU(const GDel2DInputGPU &input, GDel2DOutputGPU *output);
 }; // class GpuDel

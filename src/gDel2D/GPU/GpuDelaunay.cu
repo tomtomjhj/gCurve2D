@@ -75,6 +75,39 @@ void GpuDel::compute(const GDel2DInput &input, GDel2DOutput *output) {
   return;
 }
 
+void GpuDel::computeGPU(const GDel2DInputGPU &input, GDel2DOutputGPU *output) {
+  // Set L1 for kernels
+  cudaDeviceSetCacheConfig(cudaFuncCachePreferL1);
+
+  _input = &input.dummy;
+  _output = &output->dummy;
+
+  initProfiling();
+
+  startTiming(ProfNone);
+
+  initForFlipGPU(input);
+  splitAndFlip();
+  outputToGPU(output);
+
+  stopTiming(ProfNone, _output->stats.totalTime);
+
+  if (_input->isProfiling(ProfDetail)) {
+    std::cout << " FlipCompact time: ";
+    _diagLogCompact.printTime();
+
+    std::cout << std::endl;
+    std::cout << " FlipCollect time: ";
+    _diagLogCollect.printTime();
+
+    std::cout << std::endl;
+  }
+
+  cleanup();
+
+  return;
+}
+
 void GpuDel::startTiming(ProfLevel level) {
   if (_input->isProfiling(level))
     _profTimer[level].start();
@@ -242,6 +275,92 @@ void GpuDel::initForFlip() {
 
   // Copy constraints to GPU
   _constraintVec.copyFromHost(_input->constraintVec);
+
+  // Allocate space
+  _triVec.resize(_triMax);
+  _oppVec.resize(_triMax);
+  _triInfoVec.resize(_triMax);
+  _counters.init(CounterNum);
+
+  if (_constraintVec.size() > 0)
+    _actConsVec.resize(_constraintVec.size());
+
+  if (_input->isProfiling(ProfDiag)) {
+    __circleCountVec.resize(_triMax);
+    __rejFlipVec.resize(_triMax);
+  }
+
+  // Preallocate some buffers in the pool
+  _memPool.reserve<FlipItem>(_triMax); // flipVec
+  _memPool.reserve<int2>(_triMax);     // triMsgVec
+  _memPool.reserve<int>(_pointNum);    // vertSphereVec
+  _memPool.reserve<int>(_triMax);      // actTriVec
+  _memPool.reserve<int>(_triMax);      // Two more for common use
+  _memPool.reserve<int>(_triMax);      //
+
+  if (_constraintVec.size() > 0)
+    _memPool.reserve<int>(_triMax);
+
+  // Find the min and max coordinate value
+  typedef thrust::device_ptr<RealType> RealPtr;
+  RealPtr coords((RealType *)toKernelPtr(_pointVec));
+  thrust::pair<RealPtr, RealPtr> ret =
+      thrust::minmax_element(coords, coords + _pointVec.size() * 2);
+
+  _minVal = *ret.first;
+  _maxVal = *ret.second;
+
+  if (_input->isProfiling(ProfDebug)) {
+    std::cout << "_minVal = " << _minVal << ", _maxVal == " << _maxVal
+              << std::endl;
+  }
+
+  // Sort points along space curve
+  if (!_input->noSort) {
+    stopTiming(ProfDefault, _output->stats.initTime);
+    startTiming(ProfDefault);
+
+    IntDVec valueVec = _memPool.allocateAny<int>(_pointNum);
+    valueVec.resize(_pointVec.size());
+
+    _orgPointIdx.resize(_pointNum);
+    thrust::sequence(_orgPointIdx.begin(), _orgPointIdx.end(), 0);
+
+    thrust_transform_GetMortonNumber(_pointVec.begin(), _pointVec.end(),
+                                     valueVec.begin(), _minVal, _maxVal);
+
+    thrust_sort_by_key(
+        valueVec.begin(), valueVec.end(),
+        make_zip_iterator(make_tuple(_orgPointIdx.begin(), _pointVec.begin())));
+
+    _memPool.release(valueVec);
+
+    stopTiming(ProfDefault, _output->stats.sortTime);
+    startTiming(ProfDefault);
+  }
+
+  // Create first upper-lower triangles
+  constructInitialTriangles();
+
+  stopTiming(ProfDefault, _output->stats.initTime);
+
+  return;
+}
+
+void GpuDel::initForFlipGPU(const GDel2DInputGPU &input) {
+  startTiming(ProfDefault);
+
+  // _pointNum = _input->pointVec.size() + 1; // Plus the infinity point
+  _pointNum = input.pointVec.size() + 1;
+  _triMax = (int)(_pointNum * 2);
+
+  // Copy points to GPU
+  _pointVec.resize(_pointNum); // 1 additional slot for the infinity point
+  // _pointVec.copyFromHost(_input->pointVec);
+  thrust::copy(input.pointVec.begin(), input.pointVec.end(), _pointVec.begin());
+
+  // Copy constraints to GPU
+  // _constraintVec.copyFromHost(_input->constraintVec);
 
   // Allocate space
   _triVec.resize(_triMax);
@@ -1291,6 +1410,42 @@ void GpuDel::outputToHost() {
   // Copy to host
   _triVec.copyToHost(_output->triVec);
   _oppVec.copyToHost(_output->triOppVec);
+
+  // Output Infty point
+  _output->ptInfty = _ptInfty;
+
+  stopTiming(ProfDefault, _output->stats.outTime);
+
+  ////
+  std::cout << "# Triangles:     " << _triVec.size() << std::endl;
+
+  return;
+}
+
+void GpuDel::outputToGPU(GDel2DOutputGPU *output) {
+  startTiming(ProfDefault);
+
+  kerMarkInfinityTri<<<BlocksPerGrid, ThreadsPerBlock>>>(
+      toKernelArray(_triVec), toKernelPtr(_triInfoVec), toKernelPtr(_oppVec),
+      _infIdx);
+  CudaCheckError();
+
+  compactTris();
+
+  if (!_input->noSort) {
+    // Change the indices back to the original order
+    kerUpdateVertIdx<<<BlocksPerGrid, ThreadsPerBlock>>>(
+        toKernelArray(_triVec), toKernelPtr(_triInfoVec),
+        toKernelPtr(_orgPointIdx));
+    CudaCheckError();
+  }
+
+  ////
+  // Copy to host
+  // _triVec.copyToHost(_output->triVec);
+  // _oppVec.copyToHost(_output->triOppVec);
+  output->triVec.resize(_triVec.size());
+  thrust::copy(_triVec.begin(), _triVec.end(), output->triVec.begin());
 
   // Output Infty point
   _output->ptInfty = _ptInfty;

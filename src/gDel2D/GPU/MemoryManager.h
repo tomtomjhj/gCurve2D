@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gDel2D/GPU/CudaWrapper.h"
 #include <thrust/device_malloc.h>
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
@@ -104,10 +105,10 @@ public:
     return;
   }
 
-  size_t size() const { return _size; }
+  __device__ __host__ size_t size() const { return _size; }
   size_t capacity() const { return _capacity; }
 
-  thrust::device_reference<T> operator[](const size_t index) const {
+  __device__ __host__ thrust::device_reference<T> operator[](const size_t index) const {
     return _ptr[index];
   }
 
@@ -160,6 +161,13 @@ public:
   void copyFrom(const DevVector<T> &inArr) {
     resize(inArr.size());
     thrust::copy(inArr.begin(), inArr.end(), begin());
+    return;
+  }
+
+  void copyFrom2(const DevVector<T> &inArr1, const DevVector<T> &inArr2) {
+    resize(inArr1.size() + inArr2.size());
+    auto it = thrust::copy(inArr1.begin(), inArr1.end(), begin());
+    thrust::copy(inArr2.begin(), inArr2.end(), it);
     return;
   }
 
