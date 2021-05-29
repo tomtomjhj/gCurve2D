@@ -27,7 +27,6 @@ private:
 
   // For computing V (VD of input)
   GpuDel _v_gDel;
-  TriDVec _v_tris;
   Point2DVec _v_points;
 
   // For computing DT of S∪V

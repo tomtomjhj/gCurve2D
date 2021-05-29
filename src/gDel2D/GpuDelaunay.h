@@ -64,7 +64,7 @@ struct GDel2DOutputGPU {
 
 struct GDel2DInputGPU {
   GDel2DInput dummy;
-  Point2DVec pointVec;
+  Point2DVec *pointVec;
 };
 
 ////

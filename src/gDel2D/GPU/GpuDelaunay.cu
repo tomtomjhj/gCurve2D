@@ -351,13 +351,13 @@ void GpuDel::initForFlipGPU(const GDel2DInputGPU &input) {
   startTiming(ProfDefault);
 
   // _pointNum = _input->pointVec.size() + 1; // Plus the infinity point
-  _pointNum = input.pointVec.size() + 1;
+  _pointNum = input.pointVec->size() + 1;
   _triMax = (int)(_pointNum * 2);
 
   // Copy points to GPU
   _pointVec.resize(_pointNum); // 1 additional slot for the infinity point
   // _pointVec.copyFromHost(_input->pointVec);
-  thrust::copy(input.pointVec.begin(), input.pointVec.end(), _pointVec.begin());
+  thrust::copy(input.pointVec->begin(), input.pointVec->end(), _pointVec.begin());
 
   // Copy constraints to GPU
   // _constraintVec.copyFromHost(_input->constraintVec);

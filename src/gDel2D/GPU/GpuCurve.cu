@@ -85,7 +85,7 @@ void GpuCurve::compute(const GCurve2DInput &input, GCurve2DOutput *output) {
   // Let V be the vertices of the Voronoi diagram of S.
   // Compute DT
   // CPU input → GPU output
-  GDel2DInputGPU dt1Input{GDel2DInput{}, _s_points};
+  GDel2DInputGPU dt1Input{GDel2DInput{}, &_s_points};
   GDel2DOutputGPU dt1Output;
   _v_gDel.computeGPU(dt1Input, &dt1Output);
 
@@ -104,7 +104,7 @@ void GpuCurve::compute(const GCurve2DInput &input, GCurve2DOutput *output) {
 
   // Let D be the Delaunay triangulation of S∪V.
   _sv_points.copyFrom2(_s_points, _v_points);
-  GDel2DInputGPU dt2Input{GDel2DInput{}, _sv_points};
+  GDel2DInputGPU dt2Input{GDel2DInput{}, &_sv_points};
   GDel2DOutputGPU dt2Output;
   _sv_gDel.computeGPU(dt2Input, &dt2Output);
 
