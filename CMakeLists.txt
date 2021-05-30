@@ -47,6 +47,7 @@ cuda_add_executable(
       src/RandGen.cpp
       src/Visualizer.cpp
       src/InputCreator.cpp
+      src/gDel2D/CPU/CpuCurve.cpp
       src/gDel2D/CPU/PredWrapper.cpp
       src/gDel2D/CPU/predicates.cpp
       src/gDel2D/GPU/GpuDelaunay.cu
