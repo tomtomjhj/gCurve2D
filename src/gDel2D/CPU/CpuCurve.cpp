@@ -20,7 +20,7 @@ SegmentVec CpuCurve_compute(const Point2Vec &input) {
   // Let D be the Delaunay triangulation of S∪V.
   Point2Vec sv_points;
   sv_points.insert(sv_points.end(), s_points.begin(), s_points.end());
-  for (auto i = v_VD.vertices_begin(); i != v_VD.vertices_begin(); i++) {
+  for (auto i = v_VD.vertices_begin(); i != v_VD.vertices_end(); i++) {
     sv_points.push_back(i->point());
   }
   DT sv_DT{sv_points.begin(), sv_points.end()};
