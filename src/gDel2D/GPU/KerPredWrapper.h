@@ -120,7 +120,9 @@ DPredWrapper::doOrient2DFastExactSoS(int v0, int v1, int v2) const {
     ord = doOrient2DSoSOnly(pt[0], pt[1], pt[2], v0, v1, v2);
   }
 
-  // CudaAssert( v2 != _infIdx );
+  CudaAssert( v2 != _infIdx );
+  CudaAssert( v0 != _infIdx );
+  CudaAssert( v1 != _infIdx );
 
   if ((v0 == _infIdx) | (v1 == _infIdx) | (v2 == _infIdx))
     ord = flipOrient(ord);

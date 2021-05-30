@@ -357,6 +357,7 @@ void GpuDel::initForFlipGPU(const GDel2DInputGPU &input) {
   // Copy points to GPU
   _pointVec.resize(_pointNum); // 1 additional slot for the infinity point
   // _pointVec.copyFromHost(_input->pointVec);
+  _pointVec.resize(input.pointVec->size());
   thrust::copy(input.pointVec->begin(), input.pointVec->end(), _pointVec.begin());
 
   // Copy constraints to GPU

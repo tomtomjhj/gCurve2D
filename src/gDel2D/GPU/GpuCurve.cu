@@ -95,7 +95,7 @@ void GpuCurve::compute(const GCurve2DInput &input, GCurve2DOutput *output) {
   auto it = thrust::copy_if(dt1Output.triVec.begin(), dt1Output.triVec.end(),
                             goodTris.begin(),
                             isGoodTri{static_cast<int>(_s_points.size())});
-  goodTris.shrink(it - goodTris.begin());
+  goodTris.resize(it - goodTris.begin());
 
   // convert to VD: compute circumcenter of triangles in GPU
   _v_points.resize(goodTris.size());
