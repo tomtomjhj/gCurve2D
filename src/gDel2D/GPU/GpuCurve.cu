@@ -93,14 +93,15 @@ void GpuCurve::compute(const GCurve2DInput &input, GCurve2DOutput *output) {
   TriDVec goodTris;
   goodTris.resize(dt1Output.triVec.size());
   auto it = thrust::copy_if(dt1Output.triVec.begin(), dt1Output.triVec.end(),
-                  goodTris.begin(),
-                  isGoodTri{static_cast<int>(_s_points.size())});
+                            goodTris.begin(),
+                            isGoodTri{static_cast<int>(_s_points.size())});
   goodTris.shrink(it - goodTris.begin());
 
   // convert to VD: compute circumcenter of triangles in GPU
   _v_points.resize(goodTris.size());
-  DT2VDVertices<<<1, 1>>>(toKernelArray(_s_points), toKernelArray(goodTris),
-                          toKernelPtr(_v_points));
+  DT2VDVertices<<<BlocksPerGrid, ThreadsPerBlock>>>(toKernelArray(_s_points),
+                                                    toKernelArray(goodTris),
+                                                    toKernelPtr(_v_points));
   CudaCheckError();
 
   // Let D be the Delaunay triangulation of S∪V.
