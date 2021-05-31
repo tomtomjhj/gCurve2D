@@ -24,7 +24,7 @@ pair run(int num_points, int seed) {
   InputCreator g_creator;
   clock_t gtime1, gtime2, ctime1, ctime2;
 
-  bool custom_input = false;
+  bool custom_input = true;
   if (!custom_input) {
     g_creator.makePoints(num_points, DiskDistribution, g_input.pointVec, seed);
     gtime1 = clock();
