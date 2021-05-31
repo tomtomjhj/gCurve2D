@@ -30,7 +30,7 @@ void run(int num_points) {
   //   fin >> x >> y;
   //   g_input.pointVec.push_back(Point2{{x, y}});
   // } while (!fin.eof());
-  // gpuCurve.compute(g_input, &g_output);
+  gpuCurve.compute(g_input, &g_output);
 
   std::cout << "done1" << std::endl;
 
