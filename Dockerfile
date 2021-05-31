@@ -5,11 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 
 # dev tools
-RUN apt-get install -y software-properties-common && \
-    add-apt-repository ppa:neovim-ppa/unstable && \
-    apt-get update
 RUN apt-get install -y build-essential make unzip autoconf automake libtool cmake g++ pkg-config
-RUN apt-get install -y python3 python3-pip python3-dev
 RUN apt-get install -y git wget curl gdb vim neovim htop tmux bash-completion
 
 # dependencies
