@@ -3,6 +3,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <ctime>
 
 #include "KerCommon.h"
 #include "KerDivision.h"
@@ -80,39 +81,54 @@ void GpuCurve::compute(const GCurve2DInput &input, GCurve2DOutput *output) {
 
   // Let S be a finite set of points in the plane.
   // move input from CPU to GPU
+  clock_t time;
+  time = clock();
   _s_points.copyFromHost(input.pointVec);
+  // std::cout << ((float)(clock() - time))/CLOCKS_PER_SEC << " seconds \t _s_points.copyFromHost(input.pointVec);" << std::endl;
 
   // Let V be the vertices of the Voronoi diagram of S.
   // Compute DT
   // CPU input → GPU output
   GDel2DInputGPU dt1Input{GDel2DInput{}, &_s_points};
   GDel2DOutputGPU dt1Output;
+  time = clock();
   _v_gDel.computeGPU(dt1Input, &dt1Output);
+  // std::cout << ((float)(clock() - time))/CLOCKS_PER_SEC << " seconds \t _v_gDel.computeGPU(dt1Input, &dt1Output);" << std::endl;
 
   // filter out trash triangles
   TriDVec goodTris;
+  time = clock();
   goodTris.resize(dt1Output.triVec.size());
   auto it = thrust::copy_if(dt1Output.triVec.begin(), dt1Output.triVec.end(),
                             goodTris.begin(),
                             isGoodTri{static_cast<int>(_s_points.size())});
   goodTris.resize(it - goodTris.begin());
+  // std::cout << ((float)(clock() - time))/CLOCKS_PER_SEC << " seconds \t resize copy_if resize" << std::endl;
 
   // convert to VD: compute circumcenter of triangles in GPU
   _v_points.resize(goodTris.size());
+  time = clock();
   DT2VDVertices<<<BlocksPerGrid, ThreadsPerBlock>>>(toKernelArray(_s_points),
                                                     toKernelArray(goodTris),
                                                     toKernelPtr(_v_points));
+  // std::cout << ((float)(clock() - time))/CLOCKS_PER_SEC << " seconds \t DR2VDVertices" << std::endl;
   CudaCheckError();
 
   // Let D be the Delaunay triangulation of S∪V.
+  time = clock();
   _sv_points.copyFrom2(_s_points, _v_points);
+  // std::cout << ((float)(clock() - time))/CLOCKS_PER_SEC << " seconds \t _sv_points.copyFrom2(_s_points, _v_points);" << std::endl;
   GDel2DInputGPU dt2Input{GDel2DInput{}, &_sv_points};
   GDel2DOutputGPU dt2Output;
+  time = clock();
   _sv_gDel.computeGPU(dt2Input, &dt2Output);
+  // std::cout << ((float)(clock() - time))/CLOCKS_PER_SEC << " seconds \t _sv_gDel.computeGPU(dt2Input, &dt2Output);" << std::endl;
 
   // An edge of D belongs to the crust of S if both its endpoints belong to S
   // movo to cpu and extract crust
   TriHVec suv_tris;
+  time = clock();
   dt2Output.triVec.copyToHost(suv_tris);
   extractCrust(_s_points.size(), suv_tris, output->segmentVec);
+  // std::cout << ((float)(clock() - time))/CLOCKS_PER_SEC << " seconds \t copyToHost, extractCrust" << std::endl;
 }

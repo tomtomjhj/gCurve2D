@@ -46,12 +46,7 @@ inline void __cudaCheckError(const char *file, const int line) {
 }
 
 #if __CUDA_ARCH__ >= 200 && defined(CUDA_ERROR_CHECK)
-#define CudaAssert(X)                                                          \
-  if (!(X)) {                                                                  \
-    printf("!!!Thread %d:%d failed assert at %s:%d!!!\n", blockIdx.x,          \
-           threadIdx.x, __FILE__, __LINE__);                                   \
-    assert(X);                                                                 \
-  }
+#define CudaAssert(X) assert(X)
 #else
 #define CudaAssert(X)
 #endif
