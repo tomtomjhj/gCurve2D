@@ -29,6 +29,7 @@ docker run --rm -it --gpus all gcurve bash
 mkdir _build && cd _build
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ..
 make
+./gCurve2D
 ```
 
 # TODO
