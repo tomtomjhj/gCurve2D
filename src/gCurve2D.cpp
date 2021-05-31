@@ -19,18 +19,18 @@ void run(int num_points) {
 
   InputCreator g_creator;
   g_creator.makePoints(1000000, DiskDistribution, g_input.pointVec, 76213898);
-  std::ifstream fin;
-  fin.open("../src/data/donut2.xy");
-  if (!fin) { // file couldn't be opened
-    std::cerr << "Error: file could not be opened" << std::endl;
-    exit(1);
-  }
-  do {
-    double x, y;
-    fin >> x >> y;
-    g_input.pointVec.push_back(Point2{{x, y}});
-  } while (!fin.eof());
-  gpuCurve.compute(g_input, &g_output);
+  // std::ifstream fin;
+  // fin.open("../src/data/olympics_5000.xy");
+  // if (!fin) { // file couldn't be opened
+  //   std::cerr << "Error: file could not be opened" << std::endl;
+  //   exit(1);
+  // }
+  // do {
+  //   double x, y;
+  //   fin >> x >> y;
+  //   g_input.pointVec.push_back(Point2{{x, y}});
+  // } while (!fin.eof());
+  // gpuCurve.compute(g_input, &g_output);
 
   std::cout << "done1" << std::endl;
 
